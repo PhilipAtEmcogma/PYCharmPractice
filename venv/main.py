@@ -7,6 +7,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import pprint
+from bitmex import get_contracts
 
 load_dotenv() #loading the variables stored in .env
 # print(os.environ['BINANCE_API_KEY']) #test to see if variables loaded correctly.
@@ -66,8 +67,26 @@ write_log()
 # below if satement meant that the block of code only executed if the py file call "main" is executed
 # so if we run other python scripts that does have the name "main", it'll not run
 if __name__ == '__main__':
+
+    bitmex_contracts = get_contracts()
+
     # root component, for creating the general outline of the UI
     root = tk.Tk()
+    i = 0
+    j = 0
+    #populate the widget, must be place after root is created but before mainloop
+    for contract in bitmex_contracts:
+        label_widget = tk.Label(root,text=contract)
+        # place the label_widge into room using
+        # grid() -> good for if there's a lot of widget to be place or
+        # pack() ->place widge relative to each other, good if there isn't much widget
+        label_widget.grid(row = i, column = j)
+        if i == 4:
+            j += 1
+            i = 0
+        else:
+            i += 1
+
     root.mainloop()
 
 

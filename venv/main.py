@@ -72,15 +72,21 @@ if __name__ == '__main__':
 
     # root component, for creating the general outline of the UI
     root = tk.Tk()
+    root.configure(bg="gray12")
+
     i = 0
     j = 0
+
+    calibri_font = ("Calibri",11,"normal")
+
     #populate the widget, must be place after root is created but before mainloop
     for contract in bitmex_contracts:
-        label_widget = tk.Label(root,text=contract)
+        label_widget = tk.Label(root,text=contract, bg='gray12', fg='SteelBlue', borderwidth=1, relief=tk.GROOVE, width=13, font=calibri_font)
         # place the label_widge into room using
         # grid() -> good for if there's a lot of widget to be place or
         # pack() ->place widge relative to each other, good if there isn't much widget
-        label_widget.grid(row = i, column = j)
+        label_widget.grid(row = i, column = j, sticky ='ew')
+        # sticky = 'ew', sticky mean streatch out the widget to fill the space, e means east aka right,w means west ask left
         if i == 4:
             j += 1
             i = 0

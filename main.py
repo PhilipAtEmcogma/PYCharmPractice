@@ -11,6 +11,8 @@ import pprint
 load_dotenv() #loading the variables stored in .env
 # print(os.environ['BINANCE_API_KEY']) #test to see if variables loaded correctly.
 
+logger = logging.getLogger()
+
 
 # REST API
 # "https://testnet.binancefuture.com"
@@ -18,19 +20,22 @@ load_dotenv() #loading the variables stored in .env
 
 def get_contracts():
     response_object = requests.get("https://fapi.binance.com/fapi/v1/exchangeInfo")
-    print(response_object.status_code)
+    # print(response_object.status_code)
     # pprint.pprint(response_object.json())
     # pprint.pprint(response_object.json()['symbols'])
     contracts = []
 
     for contract in response_object.json()['symbols']:
         # pprint.pprint(contract)
-        #print(contract['pair'])
-        contracts.append(contracts['pair'])
+        # print(contract['pair'])
+        contracts.append(contract['pair'])
 
     return contracts
 
-get_contracts()
+# def get_bitmex_contracts():
+    # response_object = requests.get("https://www.bitmex.com/api/v1/instrument")
+
+print(get_contracts())
 
 """"
 logger = logging.getLogger()

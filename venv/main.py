@@ -19,24 +19,7 @@ logger = logging.getLogger()
 # "https://testnet.binancefuture.com"
 # "wss://fstream.binance.com" # wss means web socket
 
-def get_contracts():
-    response_object = requests.get("https://fapi.binance.com/fapi/v1/exchangeInfo")
-    # print(response_object.status_code)
-    # pprint.pprint(response_object.json())
-    # pprint.pprint(response_object.json()['symbols'])
-    contracts = []
 
-    for contract in response_object.json()['symbols']:
-        # pprint.pprint(contract)
-        # print(contract['pair'])
-        contracts.append(contract['pair'])
-
-    return contracts
-
-# def get_bitmex_contracts():
-    # response_object = requests.get("https://www.bitmex.com/api/v1/instrument")
-
-print(get_contracts())
 
 """"
 logger = logging.getLogger()

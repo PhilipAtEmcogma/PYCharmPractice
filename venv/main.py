@@ -2,12 +2,11 @@ import time
 import pandas as pd
 import tkinter as tk
 import logging
-from binance_futures import write_log
 import requests
 import os
 from dotenv import load_dotenv
 import pprint
-from bitmex import get_contracts
+from Connector.binance_futures import BinanceFuturesClient
 
 load_dotenv() #loading the variables stored in .env
 # print(os.environ['BINANCE_API_KEY']) #test to see if variables loaded correctly.
@@ -51,10 +50,28 @@ write_log()
 # so if we run other python scripts that does have the name "main", it'll not run
 if __name__ == '__main__':
 
-    bitmex_contracts = get_contracts()
+    # bitmex_contracts = get_contracts()
+    # NOTE: the api_key and secret_for Binance and Bitmex both are save in .env, because the code are uploaded
+    #   into github, thus to protect the private keys from being accessable by public, it was good practice to have them
+    #   store in .env and pass the .env file to gitignore.
+
+    binance = BinanceFuturesClient(os.environ['BINANCE_API_KEY'],
+                                   os.environ['BINANCE_API_SECRET'],
+                                   True)
+    # print(binance.get_historical_candles("BTCUSDT","1h"))
+
+    # self.headers = {'X-MBX-APIKEY': self.public_key}
+    print(binance.get_balance())
+    # print(binance.place_order("BTCUSDT","BUY",0.01,"LIMIT",50000,"GTC"))
+    # print(binance.get_order_status("BTCUSDT",3583386003))
+    # print(binance.cancel_order("BTCUSDT",3583386003))
+
 
     # root component, for creating the general outline of the UI
     root = tk.Tk()
+
+
+    """
     root.configure(bg="gray12")
 
     i = 0
@@ -75,7 +92,7 @@ if __name__ == '__main__':
             i = 0
         else:
             i += 1
-
+    """
     root.mainloop()
 
 

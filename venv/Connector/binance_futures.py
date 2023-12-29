@@ -76,7 +76,7 @@ class BinanceFuturesClient:
 
         elif method == "DELETE":
             try:
-                response = requests.delete(self.base_url + endpoint, params=data, headers=self.headers)
+                response = requests.delete(self.base_url + endpoint, params=data, headers=self._headers)
             except Exception as e:
                 logger.error("Connection error while making %s request to %s", method, endpoint,e)
                 return None
@@ -98,7 +98,7 @@ class BinanceFuturesClient:
 
         if exchange_info is not None:
             for contract_data in exchange_info['symbols']:
-                contracts[contract_data['pair']] = Contract(contract_data)
+                contracts[contract_data['pair']] = Contract(contract_data, "binance")
 
         return contracts
 
@@ -149,7 +149,7 @@ class BinanceFuturesClient:
         #if request is successful, loop through the list of assets and finally return the list of assets
         if account_data is not None:
             for a in account_data['assets']:
-                balances[a['asset']] = Balance(a)
+                balances[a['asset']] = Balance(a,"binance")
 
         return balances
 

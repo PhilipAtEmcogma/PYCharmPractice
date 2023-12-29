@@ -6,7 +6,9 @@ import requests
 import os
 from dotenv import load_dotenv
 import pprint
+
 from Connector.binance_futures import BinanceFuturesClient
+from Connector.bitmex import BitmexClient
 
 load_dotenv() #loading the variables stored in .env
 #print(os.environ['BINANCE_API_KEY']) #test to see if variables loaded correctly.
@@ -63,6 +65,8 @@ if __name__ == '__main__':
     # print(binance.place_order("BTCUSDT","BUY",0.01,"LIMIT",50000,"GTC"))
     # print(binance.get_order_status("BTCUSDT",3583386003))
     # print(binance.cancel_order("BTCUSDT",3583386003))
+
+    bitmex = BitmexClient(os.environ['BITMEX_API_KEY'], os.environ['BITMEX_API_SECRET'],True)
 
 
     # root component, for creating the general outline of the UI

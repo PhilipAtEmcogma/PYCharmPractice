@@ -9,7 +9,7 @@ import pprint
 from Connector.binance_futures import BinanceFuturesClient
 
 load_dotenv() #loading the variables stored in .env
-# print(os.environ['BINANCE_API_KEY']) #test to see if variables loaded correctly.
+#print(os.environ['BINANCE_API_KEY']) #test to see if variables loaded correctly.
 
 logger = logging.getLogger()
 
@@ -55,13 +55,11 @@ if __name__ == '__main__':
     #   into github, thus to protect the private keys from being accessable by public, it was good practice to have them
     #   store in .env and pass the .env file to gitignore.
 
-    binance = BinanceFuturesClient(os.environ['BINANCE_API_KEY'],
-                                   os.environ['BINANCE_API_SECRET'],
-                                   True)
+    binance = BinanceFuturesClient(os.environ['BINANCE_API_KEY'], os.environ['BINANCE_API_SECRET'],True)
     # print(binance.get_historical_candles("BTCUSDT","1h"))
 
     # self.headers = {'X-MBX-APIKEY': self.public_key}
-    print(binance.get_balance())
+    # print(binance.get_balance())
     # print(binance.place_order("BTCUSDT","BUY",0.01,"LIMIT",50000,"GTC"))
     # print(binance.get_order_status("BTCUSDT",3583386003))
     # print(binance.cancel_order("BTCUSDT",3583386003))

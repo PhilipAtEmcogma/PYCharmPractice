@@ -1,45 +1,88 @@
 import logging
-
 import requests
 import time
+import typing #typing is an more advance library for casting
+
 from urllib.parse import urlencode
 
 import hmac
 import hashlib
 
+import websocket
+import json
+
+import threading
+
+from models import * # * means import all
+
+#creating logger to log events prints
 logger = logging.getLogger()
 
 class BinanceFuturesClient:
     #__init__() is a constructor
-    def __init__(self, public_key, secret_key, testnet):
+    # public_key: str, specifies the input public_key is a string
+    def __init__(self, public_key: str, secret_key: str, testnet: bool):
         if testnet:
-            self.base_url = "https://testnet.binancefuture.com"
+            self._base_url = "https://testnet.binancefuture.com"
+            self._wss_url = "wss://stream.binancefuture.com/ws"
         else:
-            self.base_url = "https://fapi.binance.com"
+            self._base_url = "https://fapi.binance.com"
+            self._wss_url = "wss://fstream.binance.com/ws"
 
-        self.public_key = public_key
-        self.secret_key = secret_key
+        self._public_key = public_key
+        self._secret_key = secret_key
 
-        self.headers = {'X-MBX-APIKEY': self.public_key}
+        self._headers = {'X-MBX-APIKEY': self._public_key}
+
+        self.contracts = self.get_contracts()
+        self.balance = self.get_balances()
+
+        self.contracts = self.get_contracts()
+        self.balances = self.get_balances()
 
         self.prices = dict()
 
+        self._ws_id = 1
+        self._ws = None
+
+        #   the 2 steps below is to have multi-threating such that the websocket can keep running on the background,
+        #   while the program can continue to do something else
+        t = threading.Thread(target=self._start_ws)
+        t.start()
+
         logger.info("Binance Futures Client successfully initialized")
 
-    def generate_signature(self,data):
+    def _generate_signature(self, data: typing.Dict) -> str:
         #self.secret_key.encode() convert a string to a byte
         # urlencode(data).encode(),  urlencode(data) convert to a query string, then convert string to byte using .encode()
-        return hmac.new(self.secret_key.encode(), urlencode(data).encode(), hashlib.sha256).hexdigest()
+        return hmac.new(self._secret_key.encode(), urlencode(data).encode(), hashlib.sha256).hexdigest()
 
-    def make_request(self, method, endpoint, data):
+    # typing.Dict doesn't not speficy the type of the keys and values of the dictionary because
+    #   the values can be of multiple types (int, float, str...)
+    def _make_request(self, method: str, endpoint: str, data: typing.Dict):
         if method == "GET":
-            response = requests.get(self.base_url + endpoint, params=data, headers=self.headers)
+            try:
+                response = requests.get(self._base_url + endpoint, params=data, headers=self._headers)
+            except Exception as e:
+                logger.error("Connection error while making %s request to %s", method, endpoint,e)
+                return None
+
         elif method == "POST":
-            response = requests.post(self.base_url + endpoint, params=data, headers=self.headers)
+            try:
+                response = requests.post(self._base_url + endpoint, params=data, headers=self._headers)
+            except Exception as e:
+                logger.error("Connection error while making %s request to %s", method, endpoint,e)
+                return None
+
         elif method == "DELETE":
-            response = requests.delete(self.base_url + endpoint, params=data, headers=self.headers)
+            try:
+                response = requests.delete(self.base_url + endpoint, params=data, headers=self.headers)
+            except Exception as e:
+                logger.error("Connection error while making %s request to %s", method, endpoint,e)
+                return None
+
         else:
-            raise ValueError
+            raise ValueError()
 
         if response.status_code == 200:
             return response.json()
@@ -48,71 +91,71 @@ class BinanceFuturesClient:
                          method, endpoint, response.json(), response.status_code)
             return None
 
-    def get_contracts(self):
-        exchange_info = self.make_request("GET", "/fapi/v1/exchangeInfo", None)
+    def get_contracts(self) -> typing.Dict[str, Contract]:
+        exchange_info = self._make_request("GET", "/fapi/v1/exchangeInfo", dict())
 
         contracts = dict()
 
         if exchange_info is not None:
             for contract_data in exchange_info['symbols']:
-                contracts[contract_data['pair']] = contract_data
+                contracts[contract_data['pair']] = Contract(contract_data)
 
         return contracts
 
-    def get_historical_candles(self, symbol, interval):
+    def get_historical_candles(self, contract: Contract, interval: str) -> typing.List[Candle]:
         data = dict()
-        data['symbol'] = symbol
+        data['symbol'] = contract.symbol
         data['interval'] = interval
         data['limit'] = 1000
 
-        raw_candles = self.make_request("GET", "/fapi/v1/klines", data)
+        raw_candles = self._make_request("GET", "/fapi/v1/klines", data)
 
         candles = []
 
         if raw_candles is not None:
             for c in raw_candles:
-                candles.append([c[0], float(c[1]), float(c[2]), float(c[3]), float(c[4]), float(c[5])])
+                candles.append(Candle(c)) # by calling the Candle class in models.py, it'll populate the caldes array
 
         return candles
 
-    def get_bid_ask(self, symbol):
+    def get_bid_ask(self, contract: Contract) -> typing.Dict[str, float]:
         data = dict()
-        data['symbol'] = symbol
-        ob_data = self.make_request("GET", "/fapi/v1/ticker/bookTicker", data)
+        data['symbol'] = contract.symbol
+        ob_data = self._make_request("GET", "/fapi/v1/ticker/bookTicker", data)
 
         if ob_data is not None:
-            if symbol not in self.prices:
-                self.prices[symnol] = {'bid':float(ob_data['bidPrice']), 'ask':float(ob_data['askPrice'])}
+            if contract.symbol not in self.prices:
+                self.prices[contract.symbol] = {'bid': float(ob_data['bidPrice']), 'ask': float(ob_data['askPrice'])}
             else:
-                self.prices[symbol]['bid'] = float(ob_data['bidPrice'])
-                self.prices[symbol]['ask'] = float(ob_data['askPrice'])
+                self.prices[contract.symbol]['bid'] = float(ob_data['bidPrice'])
+                self.prices[contract.symbol]['ask'] = float(ob_data['askPrice'])
 
-
+            return self.prices[contract.symbol]
         """
         # the link below, anything after ? is a parameter, it can take more than 1 parameter,
         # simply by putting a &, for example below. getting infor for BTCUSD and ADAUSDT
         "https://testnet.binancefuture.com/fapi/v1/ticker/bookTicker?symbol=BTCUSDT&symbol=ADAUSDT"
         """
 
-        return self.prices[symbol]
 
-    def get_balance(self):
+    def get_balances(self) -> typing.Dict[str, Balance]:
         data = dict()
         data['timestamp'] = int(time.time() * 1000)
-        data['signature'] = self.generate_signature(data)
+        data['signature'] = self._generate_signature(data)
+
         balances = dict()
 
-        account_data = self.make_request("GET","/fapi/v2/account",data)
-
+        account_data = self._make_request("GET", "/fapi/v2/account", data)
         #if request is successful, loop through the list of assets and finally return the list of assets
         if account_data is not None:
             for a in account_data['assets']:
-                balances[a['asset']] = a
+                balances[a['asset']] = Balance(a)
+
         return balances
 
-    def place_order(self, symbol, side, quantity, order_type, price=None, tif=None):
+    def place_order(self, contract: Contract, side: str, quantity: float, order_type: str, price=None, tif=None) -> OrderStatus:
         data = dict()
-        data['symbol'] = symbol
+        data['symbol'] = contract.symbol
         data['side'] = side
         data['quantity'] = quantity
         data['type'] = order_type
@@ -125,36 +168,102 @@ class BinanceFuturesClient:
             data['timeInForce'] = tif
 
         data['timestamp'] = int(time.time() * 1000)
-        data['signature'] = self.generate_signature(data)
+        data['signature'] = self._generate_signature(data)
 
-        order_status = self.make_request("POST", "/fapi/v1/order", data)
+        order_status = self._make_request("POST", "/fapi/v1/order", data)
+
+        if order_status is not None:
+            order_status = OrderStatus(order_status)
 
         return order_status
 
-    def cancel_order(self,symbol,order_id):
+    def cancel_order(self, contract: Contract, order_id: int) -> OrderStatus:
+
         data = dict()
         data['orderId'] = order_id
-        data['symbol'] = symbol
+        data['symbol'] = contract.symbol
 
         data['timestamp'] = int(time.time() * 1000)
-        data['signature'] = self.generate_signature(data)
+        data['signature'] = self._generate_signature(data)
 
-        order_status = self.make_request("DELETE", "/fapi/v1/order", data)
+        order_status = self._make_request("DELETE", "/fapi/v1/order", data)
+
+        if order_status is not None:
+            order_status = OrderStatus(order_status)
 
         return order_status
 
-    def get_order_status(self, symbol, order_id):
+    def get_order_status(self, contract: Contract, order_id: int) -> OrderStatus:
+
         data = dict()
-        data['timestamp'] = int(time.time()*1000)
-        data['symbol']=symbol
-        data['orderId']=order_id
-        data['signature'] = self.generate_signature(data)
+        data['timestamp'] = int(time.time() * 1000)
+        data['symbol'] = contract.symbol
+        data['orderId'] = order_id
+        data['signature'] = self._generate_signature(data)
 
-        order_status = self.make_request("GET","/fapi/v1/order", data)
+        order_status = self._make_request("GET", "/fapi/v1/order", data)
+
+        if order_status is not None:
+            order_status = OrderStatus(order_status)
+
         return order_status
+
+    def _start_ws(self):
+        self.ws = websocket.WebSocketApp(self._wss_url, on_open=self._on_open, on_close=self._on_close, on_error=self._on_error,
+                                    on_message=self._on_message)
+
+        while True:
+            try:
+                self.ws.run_forever()
+            except Exception as e:
+                logger.error("Binance error in run_forever() method: %s",e)
+            time.sleep(2)
+
+    def _on_open(self, ws):
+        logger.info("Binance connection opened")
+
+        self.subscribe_channel(list(self.contracts.values()), "bookTicker")
+
+    def _on_close(self, ws):
+        logger.warning("Binance Websocket connection closed")
+
+    def _on_error(self, ws, msg: str):
+        logger.error("Binance connection error: %s", msg)
+
+    def _on_message(self, ws, msg: str):
+
+        data = json.loads(msg)
+
+        if "e" in data:
+            if data['e'] == "bookTicker":
+
+                symbol = data['s']
+
+                if symbol not in self.prices:
+                    self.prices[symbol] = {'bid': float(data['b']), 'ask': float(data['a'])}
+                else:
+                    self.prices[symbol]['bid'] = float(data['b'])
+                    self.prices[symbol]['ask'] = float(data['a'])
+
+    def subscribe_channel(self, contract: typing.List[Contract], channel: str):
+        data = dict()
+        data['method'] = "SUBSCRIBE"
+        data['params'] = []
+
+        for contract in contracts:
+            data['params'].append(contract.symbol.lower() + "@" + channel)
+        data['id'] = self._ws_id
+
+        try:
+            self.ws.send(json.dumps(data))
+        except Exception as e:
+            logger.error("Websocket error while subscribing to %s: %s", contract, endpoint, e)
+
+        self._ws_id += 1
+
 """
 def get_contracts():
-    response_object = requests.get("https://fapi.binance.com/fapi/v1/exchangeInfo")
+    response_object = requests.get("https://fapi.binance.com/fapi/v2/exchangeInfo")
     # print(response_object.status_code)
     # pprint.pprint(response_object.json())
     # pprint.pprint(response_object.json()['symbols'])

@@ -257,7 +257,7 @@ class BinanceFuturesClient:
         try:
             self.ws.send(json.dumps(data))
         except Exception as e:
-            logger.error("Websocket error while subscribing to %s: %s", contract, endpoint, e)
+            logger.error("Websocket error while subscribing to %s %s updates: %s", len(contracts), channel, e)
 
         self._ws_id += 1
 

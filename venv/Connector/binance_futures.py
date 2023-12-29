@@ -114,7 +114,7 @@ class BinanceFuturesClient:
 
         if raw_candles is not None:
             for c in raw_candles:
-                candles.append(Candle(c)) # by calling the Candle class in models.py, it'll populate the caldes array
+                candles.append(Candle(c,"binance")) # by calling the Candle class in models.py, it'll populate the caldes array
 
         return candles
 
@@ -173,7 +173,7 @@ class BinanceFuturesClient:
         order_status = self._make_request("POST", "/fapi/v1/order", data)
 
         if order_status is not None:
-            order_status = OrderStatus(order_status)
+            order_status = OrderStatus(order_status,"binance")
 
         return order_status
 
@@ -189,7 +189,7 @@ class BinanceFuturesClient:
         order_status = self._make_request("DELETE", "/fapi/v1/order", data)
 
         if order_status is not None:
-            order_status = OrderStatus(order_status)
+            order_status = OrderStatus(order_status,"binance")
 
         return order_status
 

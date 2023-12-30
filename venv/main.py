@@ -10,6 +10,8 @@ import pprint
 from Connector.binance_futures import BinanceFuturesClient
 from Connector.bitmex import BitmexClient
 
+from Interface.root_component import Root
+
 load_dotenv() #loading the variables stored in .env
 #print(os.environ['BINANCE_API_KEY']) #test to see if variables loaded correctly.
 
@@ -70,8 +72,8 @@ if __name__ == '__main__':
 
 
     # root component, for creating the general outline of the UI
-    root = tk.Tk()
-
+    root = Root()
+    root.mainloop()
 
     """
     root.configure(bg="gray12")
@@ -95,6 +97,6 @@ if __name__ == '__main__':
         else:
             i += 1
     """
-    root.mainloop()
+
 
 

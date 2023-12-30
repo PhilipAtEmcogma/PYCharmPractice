@@ -217,7 +217,7 @@ class BitmexClient:
                     if 'bidPrice' in d:
                         self.prices[symbol]['ask'] = d['askPrice']
 
-                    print(symbol, self.prices[symbol])
+                    # print(symbol, self.prices[symbol])
 
     def subscribe_channel(self, topic: str):
         data = dict()

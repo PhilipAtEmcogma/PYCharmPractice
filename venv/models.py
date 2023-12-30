@@ -45,7 +45,7 @@ class Candle:
             self.close = candle_info['close']
             self.volume = candle_info['volume']
 def tick_to_decimals(tick_size: float) -> int:
-    tick_size_str = "{0.8f}".format(tick_size)
+    tick_size_str = "{0:0.8f}".format(tick_size)
     while tick_size_str[-1] == "0":
         tick_size_str = tick_size_str[:-1]
 
@@ -68,8 +68,8 @@ class Contract:
             #   therefore need to read and adjust appropriately for each exchange
             self.price_decimals = contract_info['pricePrecision']
             self.quantity_decimals = contract_info['quantityPrecision']
-            self.tick_size = 1/(10,contract_info['pricePrecision'])
-            self.lot_size = 1/(10,contract_info['quantityPrecision'])
+            self.tick_size = 1/pow(10, contract_info['pricePrecision'])
+            self.lot_size = 1/pow(10, contract_info['quantityPrecision'])
         elif exchange == "bitmex":
             self.symbol = contract_info['symbol']
             self.base_asset = contract_info['rootSymbol']

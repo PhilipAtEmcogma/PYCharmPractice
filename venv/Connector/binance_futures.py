@@ -114,7 +114,7 @@ class BinanceFuturesClient:
 
         if raw_candles is not None:
             for c in raw_candles:
-                candles.append(Candle(c,"binance")) # by calling the Candle class in models.py, it'll populate the caldes array
+                candles.append(Candle(c,interval,"binance")) # by calling the Candle class in models.py, it'll populate the caldes array
 
         return candles
 
@@ -209,12 +209,12 @@ class BinanceFuturesClient:
         return order_status
 
     def _start_ws(self):
-        self.ws = websocket.WebSocketApp(self._wss_url, on_open=self._on_open, on_close=self._on_close, on_error=self._on_error,
-                                    on_message=self._on_message)
+        self._ws = websocket.WebSocketApp(self._wss_url, on_open=self._on_open, on_close=self._on_close,
+                                          on_error=self._on_error, on_message=self._on_message)
 
         while True:
             try:
-                self.ws.run_forever()
+                self._ws.run_forever()
             except Exception as e:
                 logger.error("Binance error in run_forever() method: %s",e)
             time.sleep(2)
@@ -255,7 +255,7 @@ class BinanceFuturesClient:
         data['id'] = self._ws_id
 
         try:
-            self.ws.send(json.dumps(data))
+            self._ws.send(json.dumps(data))
         except Exception as e:
             logger.error("Websocket error while subscribing to %s %s updates: %s", len(contracts), channel, e)
 

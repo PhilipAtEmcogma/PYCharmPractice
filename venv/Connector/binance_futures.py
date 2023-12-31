@@ -42,6 +42,8 @@ class BinanceFuturesClient:
 
         self.prices = dict()
 
+        self.logs = []
+
         self._ws_id = 1
         self._ws = None
 
@@ -51,6 +53,11 @@ class BinanceFuturesClient:
         t.start()
 
         logger.info("Binance Futures Client successfully initialized")
+
+    def _add_log(self, msg: str):
+        logger.info("%s", msg)
+        self.logs.append(
+            {"log": msg, "displayed": False})  # displayed will become True, after new data had been logged
 
     def _generate_signature(self, data: typing.Dict) -> str:
         #self.secret_key.encode() convert a string to a byte

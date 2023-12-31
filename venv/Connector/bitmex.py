@@ -39,10 +39,17 @@ class BitmexClient:
 
         self.prices = dict()
 
+        # the below is to check whether new data is avaliable to log, log it if so
+        self.logs = []
+
         t = threading.Thread(target=self._start_ws)
         t.start()
 
         logger.info("Bitmex Client successfully initialized")
+
+    def _add_log(self,msg: str):
+        logger.info("%s", msg)
+        self.logs.append({"log": msg, "displayed": False}) #displayed will become True, after new data had been logged
 
     def _generate_signature(self, method: str, endpoint: str, expires: str, data: typing.Dict) -> str:
 
@@ -216,6 +223,10 @@ class BitmexClient:
                         self.prices[symbol]['bid'] = d['bidPrice']
                     if 'bidPrice' in d:
                         self.prices[symbol]['ask'] = d['askPrice']
+
+                    if symbol == "XBTUSD":
+                        self._add_log(symbol + " " + str(self.prices[symbol]['bid']) + " / "
+                                                         + str(self.prices[symbol]['ask']))
 
                     # print(symbol, self.prices[symbol])
 

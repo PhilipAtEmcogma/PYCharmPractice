@@ -68,11 +68,13 @@ if __name__ == '__main__':
     # print(binance.get_order_status("BTCUSDT",3583386003))
     # print(binance.cancel_order("BTCUSDT",3583386003))
 
+
     bitmex = BitmexClient(os.environ['BITMEX_API_KEY'], os.environ['BITMEX_API_SECRET'],True)
 
 
     # root component, for creating the general outline of the UI
-    root = Root()
+    # pass binance and bitmex keys into Root to instandciate it
+    root = Root(binance, bitmex)
     root.mainloop()
 
     """

@@ -224,9 +224,11 @@ class BitmexClient:
                     if 'bidPrice' in d:
                         self.prices[symbol]['ask'] = d['askPrice']
 
+                    """"
                     if symbol == "XBTUSD":
                         self._add_log(symbol + " " + str(self.prices[symbol]['bid']) + " / "
                                                          + str(self.prices[symbol]['ask']))
+                    """
 
                     # print(symbol, self.prices[symbol])
 

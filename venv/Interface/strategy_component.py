@@ -3,12 +3,25 @@ import typing
 
 from Interface.styling import *
 
+from Connector.binance_futures import BinanceFuturesClient
+from Connector.bitmex import BitmexClient
+
+
 class StrategyEditor(tk.Frame):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, root, binance:BinanceFuturesClient, bitmex:BitmexClient, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._all_contracts = ["BTCUSDT","ETHUSDT"]
+        self.root = root
+
+        self._exchanges = {"Binance": binance, "Bitmex": bitmex}
+
+        self._all_contracts = []
         self._all_timeframes = ["1m","5m","15m","30m","1h","4h"]
+
+        #first loop through the exchange (key) then the client (value, binance or bitmex)
+        for exchange, client in self._exchanges.items():
+            for symbol, contract in client.contracts.items():
+                self._all_contracts.append(symbol + "_" + exchange.capitalize())
 
         self._commands_frame = tk.Frame(self, bg=BG_COLOR)
         self._commands_frame.pack(side=tk.TOP)
@@ -182,5 +195,48 @@ class StrategyEditor(tk.Frame):
 
 
     def _switch_strategy(self, b_index: int):
-        return
+        # loop through the parameters to see if there's any missing input for the new strategy
+        for param in ["balance_pct","take_profit","stop_loss"]:
+            if self.body_widgets[param][b_index].get() == "":
+                self.root.logging_frame.add_log(f"Missing {param} parameter")
+                return
 
+        # check if the parameters of the chosen strategy chosen had all parameters set
+        strat_selected = self.body_widgets['strategy_type_var'][b_index].get()
+
+        for param in self._extra_params[strat_selected]:
+            if self._additional_parameters[b_index][param['code_name']] is None:
+                self.root.logging_frame.add_log(f"Missing {param['code_name']} parameter")
+                return
+
+        # once all parameter had beed inputted pass them through, and separate them by symbols and exchange
+        symbol = self.body_widgets['contract_var'][b_index].get().split("_")[0]
+        timeframe = self.body_widgets['timeframe_var'][b_index].get()
+        exchange = self.body_widgets['contract_var'][b_index].get().split("_")[1]
+
+        balance_pct = float(self.body_widgets['balance_pct'][b_index].get())
+        take_profit = float(self.body_widgets['take_profit'][b_index].get())
+        stop_loss = float(self.body_widgets['stop_loss'][b_index].get())
+
+        # if strategy is activate, switch it off, vice versa
+        if self.body_widgets['activation'][b_index].cget("text") == "OFF":
+            # switch off input box to prevent user from changing parameter value when strategy is running
+            for param in self._base_params:
+                code_name = param['code_name']
+
+                if code_name != "activation" and "_var" not in code_name:
+                    #deactive the widget
+                    self.body_widgets[code_name][b_index].config(state=tk.DISABLED)
+
+                self.body_widgets[code_name][b_index].config(bg="darkgreen", text="ON")
+                self.root.logging_frame.add_log(f"{strat_selected} strat_selected on {symbol}/{timeframe} started")
+        else:
+            for param in self._base_params:
+                code_name = param['code_name']
+
+                if code_name != "activation" and "_var" not in code_name:
+                    #deactive the widget
+                    self.body_widgets[code_name][b_index].config(state=tk.NORMAL)
+
+                self.body_widgets[code_name][b_index].config(bg="darkred", text="OFF")
+                self.root.logging_frame.add_log(f"{strat_selected} strat_selected on {symbol}/{timeframe} stopped")

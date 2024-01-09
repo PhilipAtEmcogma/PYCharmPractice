@@ -233,6 +233,20 @@ class StrategyEditor(tk.Frame):
             else:
                 return
 
+            new_strategy.candle = self._exchanges[exchange].get_historical_candles(contract,timeframee)
+
+            # if length of candles is 0, means there's error retrieving data.
+            if len(new_strategy.candle) == 0:
+                self.root.logging_frame.add_log(f"No historical data retrieved for {contract.symbol}")
+                return
+
+            """"
+            if exchange == "Binance":
+                self._exchanges[exchange].subscribe_channel([contract], "aggTrade"]
+            """
+
+            self._exchanges[exchange].strategies[b_index] = new_strategy
+
             # switch off input box to prevent user from changing parameter value when strategy is running
             for param in self._base_params:
                 code_name = param['code_name']
@@ -244,6 +258,8 @@ class StrategyEditor(tk.Frame):
                 self.body_widgets[code_name][b_index].config(bg="darkgreen", text="ON")
                 self.root.logging_frame.add_log(f"{strat_selected} strat_selected on {symbol}/{timeframe} started")
         else:
+            del self._exchanges[exchange].strategies[b_index]
+
             for param in self._base_params:
                 code_name = param['code_name']
 

@@ -15,6 +15,8 @@ import threading
 
 from models import * # * means import all
 
+from Strategies import TechnicalStrategy,BreakoutStrategy
+
 #creating logger to log events prints
 logger = logging.getLogger()
 
@@ -41,6 +43,7 @@ class BinanceFuturesClient:
         self.balances = self.get_balances()
 
         self.prices = dict()
+        self.strategies: typing.Dict[int, typing.Union[TechnicalStrategy,BreakoutStrategy]] =dict()
 
         self.logs = []
 
@@ -230,6 +233,17 @@ class BinanceFuturesClient:
         logger.info("Binance connection opened")
 
         self.subscribe_channel(list(self.contracts.values()), "bookTicker")
+        self.subscribe_channel(list(self.contracts.values()), "aggTrade")
+
+        """
+        if self.subscribe_channel(list(self.contracts.values()), "aggTrade") triggers an "Invalid close opcode" error,
+        remove it from _on_open(), and subscribe to the aggTrade channel only for the symbol I need when activating a strategy,
+        thus in strategy_component.py under  _switch_strategy add (I already added it, just commeneted out, 
+        if need just uncomment it to use):
+        
+        if exchange == "Binance":
+            self._exchanges[exchange].subscribe_channel([contract],"aggTrade"]
+        """
 
     def _on_close(self, ws):
         logger.warning("Binance Websocket connection closed")
@@ -251,6 +265,14 @@ class BinanceFuturesClient:
                 else:
                     self.prices[symbol]['bid'] = float(data['b'])
                     self.prices[symbol]['ask'] = float(data['a'])
+
+            elif data['e'] == "aggTrade":
+
+                symbol = data['s']
+
+                for key, strat in self.strategies.items():
+                    if strat.contract.symbol == symbol:
+                        strat.parse_trades(float(data['p']), float(data['q']), data['T'])
 
     def subscribe_channel(self, contract: typing.List[Contract], channel: str):
         data = dict()

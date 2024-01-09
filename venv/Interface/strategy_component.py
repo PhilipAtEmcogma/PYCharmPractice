@@ -65,6 +65,7 @@ class StrategyEditor(tk.Frame):
         self._extra_params = {
             # 1st technical indicator
             "Technical" : [
+                {"code_name": "rsi_length", "name": "RSI Peroids", "widget": tk.Entry, "data_type": int},
                 {"code_name":"ema_fast","name":"MACD Fast Length","widget":tk.Entry,"data_type":int},
                 {"code_name": "ema_slow", "name": "MACD Slow Length", "widget": tk.Entry, "data_type": int},
                 {"code_name": "ema_signal", "name": "MACD Signal Length", "widget": tk.Entry, "data_type": int}

@@ -1,6 +1,8 @@
 import logging
 from typing import *
 
+import pandas as pd
+
 from models import *
 
 logger = logging.getLogger()
@@ -85,6 +87,76 @@ class TechnicalStrategy(Strategy):
         self._ema_slow = other_params('ema_slow')
         self._ema_signal = other_params('ema_signal')
 
+        self._rsi_length = other_params['rsi_length']
+
+    def _rsi(self):
+        close_list = []
+        for candle in self.candles:
+            close_list.append(candle.close)
+
+        closes = pd.Series(close_list)
+        """
+            RSI Formular:
+            100-(100/(1+RS))
+            
+            where,
+            RS = Relative Strength = Average Gain/ Average Loss        
+        """
+
+        # we use dropna, because diff = difference, which need atleast 2 existing value.  Thus drop any NA or empty value
+        delta = closes.diff().dropna()
+
+        up, down = delta.copy(), delta.copy()
+        up[up < 0] = 0 # so only have positive numbers for the up series
+        down[down > 0] = 0 # so only have negative numbers for the down series
+
+        ave_gain = up.ewm(com=(self._rsi_length-1), min_periods=self._rsi_length).mean()
+        ave_loss = down.ewm(com=(self._rsi_length-1), min_periods=self._rsi_length).mean()
+
+        rs = avg_gain / avg_loss
+        rsi = 100 - 100/(1+rs)
+        rsi = rsi.round(2)
+
+        # only return the candle before the current one
+        return rsi.iloc[-2]
+
+    def _macd(self) -> Tuple[float, float]:
+        """
+            MACD Calculation Steps:
+            1. Fast EMA calculation
+            2. Slow EMA calculation
+            3. Fast EMA - Slow EMA
+            4. EMA on the results of 3.
+        """
+        close_list = []
+        for candle in self.candles:
+            close_list.append(candle.close)
+
+        closes = pd.Series(close_list)
+        # ewm() provides Exponential Weighted functions, new ema_fast base on previous ema_fast candle
+        ema_fast = closes.ewm(span=self._ema_fast).mean() # step 1
+        ema_slow = closes.ewm(span=self._ema_slow).mean() # step 2
+
+        # macd_line - step 3
+        macd_line = ema_fast - ema_slow
+        macd_signal = macd_line.ewm(span=self._ema_signal).mean()
+
+        return macd_line.iloc[-2], macd_signal.iloc[-2]
+
+    def _check_signal(self):
+        macd_line, macd_signal = self._macd()
+        rsi = self._rsi()
+
+        print(rsi, macd_line, macd_signal)
+
+        print(rsi,macd)
+
+        if rsi < 30 and macd_line > macd_signal:
+            return 1
+        elif rsi > 70 and macd_line < macd_signal:
+            return -1
+        else:
+            return 0
 
 class BreakoutStrategy(Strategy):
     def __init__(self, contract:Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,

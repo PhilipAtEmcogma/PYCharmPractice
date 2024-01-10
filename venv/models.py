@@ -88,6 +88,16 @@ class Contract:
             self.tick_size = contract_info['tickSize']
             self.lot_size = contract_info['lotSize']
 
+            self.quanto = contract_info['isQuanto']
+            self.inverse = contract_info['isInverse']
+
+            # contract value
+            self.multiplier = contract_info['multiplier'] * BITMEX_MULTIPLIER # convert from satoshi to btc
+
+            self.inverse:
+                self.multiplier *= -1
+
+
 
 class OrderStatus:
     def __init__(selfself, order_info, exchange):

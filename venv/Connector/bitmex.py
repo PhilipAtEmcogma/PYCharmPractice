@@ -263,3 +263,34 @@ class BitmexClient:
         except Exception as e:
             logger.error("Websocket error while subscribing to %s: %s", topic, e)
 
+
+    def get_trade_size(self, contract:Contract, price:float, balance_pct:float):
+
+        balance = self.get_balances()
+        if balance is not None:
+            # check if balance have USDT key to trade with, i.e. have money to trade with
+            if 'XBt' in balance:
+                balance = balance['XBt'].wallet_balance
+            else:
+                return None
+        else:
+            return None
+
+        xbt_size = balance * balance_pct / 100
+
+        # calculate the number of contracts to trade, NOTE: inverse, quato and linear are different type of trade mechanism
+        # for inverse contract of perpetual and futures contracts, xBt value of 1 contract = 1/Price*$1, $1 is the multiplier
+        if contract.inverse:
+            contract_number = xbt_size / (contract.multiplier/price)
+        # for quanto contract, xBt value of 1 contract = multiplier * price
+        elif contract.quanto:
+            contract_number = xbt_size / (contract.multiplier * price)
+        # linear contract use same formular to
+        else:
+            contract_number = xbt_size / (contract.multiplier * price)
+
+        logger.info("Bitmex current XBT balance = %s, contracts number = %s", balance, contract_number)
+
+        return int(contract_number)
+
+

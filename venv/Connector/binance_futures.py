@@ -291,6 +291,27 @@ class BinanceFuturesClient:
 
         self._ws_id += 1
 
+    def get_trade_size(self, contract: Contract, price: float, balance_pct: float):
+
+        balance = self.get_balances()
+        if balance is not None:
+            # check if balance have USDT key to trade with, i.e. have money to trade with
+            if 'USDT' in balance:
+                balance = balance['USDT'].wallet_balance
+            else:
+                return None
+        else:
+            return None
+
+        # calculate trade size, after making sure there's USDT balance
+        trade_size = (balance * balance_pct / 100) / price
+
+        trade_size = round(round(trade_size / contract.lot_size) * contract.lot_size, 8)
+
+        logger.info("Binance Futures current USDT balance = %s, trade size = %s", balance, trade_size)
+
+        return trade_size
+
 """
 def get_contracts():
     response_object = requests.get("https://fapi.binance.com/fapi/v2/exchangeInfo")

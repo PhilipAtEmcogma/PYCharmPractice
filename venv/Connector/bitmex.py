@@ -241,7 +241,8 @@ class BitmexClient:
 
                     for key, strat in self.strategies.items():
                         if strat.contract.symbol == symbol:
-                            strat.parse_trades(float(d['price']), float(d['size']), data['T'], ts)
+                            res = strat.parse_trades(float(d['price']), float(d['size']), ts)
+                            strat.check_trade(res)
 
                     """"
                     if symbol == "XBTUSD":

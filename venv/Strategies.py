@@ -22,10 +22,19 @@ class Strategy:
         self.take_profit = take_profit
         self.stop_loss = stop_loss
 
+        self.open_position = False
+
         # variable to stores candle
         self.candle: typing.List[Candle] = []
 
     def parse_trades(self, price: float, size:float, timestamp: int) -> str:
+
+        timestamp_diff = int(time.time()*1000) - timestamp
+        # if a we see a lot of this error message, then it means computer need to sync with server time
+        if timestamp_diff >= 2000:
+            logger.warning("%s %s: %s milliseconds of difference between the current time and the trade time",
+                           self.exchange, self.contrat.symbol, timestamp_diff)
+
         last_candle= self.candle[-1]
 
         # same candle
@@ -158,6 +167,15 @@ class TechnicalStrategy(Strategy):
         else:
             return 0
 
+    def check_trade(self, tick_type: str):
+        # open trade ONLY if NO position is already open
+        if tick_type == "new_candle" and not self.open_position:
+            signal_result = self._check_signal()
+
+            if signal_result in [-1,1]:
+                self._open_position(signal_result)
+
+
 class BreakoutStrategy(Strategy):
     def __init__(self, contract:Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,
                  stop_loss: float, other_params: Dict):
@@ -174,3 +192,12 @@ class BreakoutStrategy(Strategy):
             return -1
         else:
             return 0
+
+    def check_trade(self, tick_type:str):
+        # don't need to worry about new candle, only open trade if there's no existing trade open
+        if not self.open_position:
+            signal_result = self._check_signal()
+
+            if signal_result in [-1, 1]:
+                self._open_position(signal_result)
+

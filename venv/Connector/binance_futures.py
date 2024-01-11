@@ -163,10 +163,10 @@ class BinanceFuturesClient:
 
         return balances
 
-    def place_order(self, contract: Contract, side: str, quantity: float, order_type: str, price=None, tif=None) -> OrderStatus:
+    def place_order(self, contract: Contract, order_type:str, quantity: float, side: str, price=None, tif=None) -> OrderStatus:
         data = dict()
         data['symbol'] = contract.symbol
-        data['side'] = side
+        data['side'] = side.upper()
         data['quantity'] = round(round(quantity/contract.lot_size) * contract.lot_size, 8) # round to only have 8 decimal place
         data['type'] = order_type
 

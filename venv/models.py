@@ -94,7 +94,7 @@ class Contract:
             # contract value
             self.multiplier = contract_info['multiplier'] * BITMEX_MULTIPLIER # convert from satoshi to btc
 
-            self.inverse:
+            if self.inverse:
                 self.multiplier *= -1
 
 
@@ -103,9 +103,21 @@ class OrderStatus:
     def __init__(selfself, order_info, exchange):
         if exchange == "binance":
             self.order_id = order_info['orderId']
-            self.status = order_info['status']
+            self.status = order_info['status'].lower()
             self.avg_price = float(order_info['avgPrice'])
         elif exchange == "bitmex":
             self.order_id = order_info['orderID']
-            self.status = order_info['ordStatus']
+            self.status = order_info['ordStatus'].lower()
             self.avg_price = float(order_info['avgPx'])
+
+class Trade:
+    def __init__(self, trade_info):
+        self.time: int = trade_info['time']
+        self.contract: Contract = trade_info['contract']
+        self.strategy: str = trade_info['strategy']
+        self.side: str = trade_info['side']
+        self.entry_price: float = trade_info['entry_price']
+        self.status: str = trade_info['status']
+        self.pnl: float = trade_info['pnl']
+        self.quantity = trade_info['quantity'] #can be int or float, no need to type cast it
+        self.entry_id = trade_info['entry_id'] #can be a string or an int, so no need to type cast it

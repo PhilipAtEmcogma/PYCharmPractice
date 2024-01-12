@@ -97,6 +97,8 @@ class Contract:
             if self.inverse:
                 self.multiplier *= -1
 
+        self.exchange = exchange
+
 
 
 class OrderStatus:

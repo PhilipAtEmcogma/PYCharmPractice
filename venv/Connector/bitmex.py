@@ -230,6 +230,40 @@ class BitmexClient:
                     if 'bidPrice' in d:
                         self.prices[symbol]['ask'] = d['askPrice']
 
+                    # PNL calculation
+                    try:
+                        for b_index, strat in self.strategies.items():
+                            if strat.contract.symbol == symbol:
+                                for trade in strat.trades:
+                                    if trade.status == "open" and trade.entry_price is not None:
+                                        if trade.side == "long":
+                                            price = self.prices[symbol]['bid']
+                                        else:
+                                            price = self.prices[symbol]['ask']
+                                        multiplier = trade.contract.multiplier
+
+                                        """
+                                            XBt PNL of 1 contract.
+                                            Inverse:
+                                                (1/EntryPrice - 1/ExitPrice) *$1
+                                                
+                                            Quanto (will be similar to Binance):
+                                                (ExitPrice - EntryPrice) * Multiplier                                    
+                                        """
+                                        if trade.contract.inverse:
+                                            if trade.side == "long":
+                                                trade.pnl = (1/trade.entry_price - 1/price)* multiplier * trade.quantity
+                                            elif trade.side == "short":
+                                                trade.pnl = (1/price - 1/trade.entry_price) * multiplier * trade.quantity
+
+                                        else:
+                                            if trade.side == "long":
+                                                trade.pnl = (price - trade.entry_price)* multiplier * trade.quantity
+                                            elif trade.side == "short":
+                                                trade.pnl = (trade.entry_price - price)* multiplier * trade.quantity
+                    except RuntimeError as e:
+                        logger.error("Error while looping through the Bitmex Strategies: %s", e)
+
             if data['table'] == "trade":
                 for d in data['data']:
                     symbol = d['symbol']

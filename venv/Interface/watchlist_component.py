@@ -1,5 +1,6 @@
 import tkinter as tk
 import typing
+import tkmacosx as tkmac
 
 from models import *
 from Interface.styling import *
@@ -22,7 +23,7 @@ class Watchlist(tk.Frame):
         self._binance_label.grid(row=0,column=0) # location at top left, 1st cell
 
         self._binance_entry = tk.Entry(self._commands_frame, fg=FG_COLOR, justify=tk.CENTER, insertbackground=FG_COLOR,
-                                       bg=BG_COLOR_2)
+                                       bg=BG_COLOR_2, highlightthickness= False)
         #when binance button and enter is pressed, call a callback function
         self._binance_entry.bind("<Return>", self._add_binance_symbol)
         self._binance_entry.grid(row=1,column=0)
@@ -31,7 +32,7 @@ class Watchlist(tk.Frame):
         self._bitmex_label.grid(row=0, column=1)
 
         self._bitmex_entry = tk.Entry(self._commands_frame, fg=FG_COLOR, justify=tk.CENTER, insertbackground=FG_COLOR,
-                                      bg=BG_COLOR_2)
+                                      bg=BG_COLOR_2, highlightthickness= False)
 
         self._bitmex_entry.bind("<Return>", self._add_bitmex_symbol)
         self._bitmex_entry.grid(row=1,column=1)
@@ -103,7 +104,7 @@ class Watchlist(tk.Frame):
         self.body_widgets['ask'][b_index].grid(row=b_index, column=3)
 
         # remove button
-        self.body_widgets['remove'][b_index] = tk.Button(self._table_frame,text="X",
+        self.body_widgets['remove'][b_index] = tkmac.Button(self._table_frame,text="X", borderless=True,
                                                             bg="darkred", fg=FG_COLOR, font=GLOBAL_FONT,
                                                             command=lambda: self._remove_symbol(b_index))
         self.body_widgets['remove'][b_index].grid(row=b_index, column=4)

@@ -8,7 +8,8 @@ class Logging(tk.Frame):
         #super() initiate a frame to argument pass into it
         super().__init__(*args,**kwargs)
 
-        self.logging_text = tk.Text(self, height=19, width=60, state=tk.DISABLED, bg=BG_COLOR, fg=FG_COLOR_2, font=GLOBAL_FONT)
+        self.logging_text = tk.Text(self, height=19, width=60, state=tk.DISABLED, bg=BG_COLOR, fg=FG_COLOR_2,
+                                    font=GLOBAL_FONT, highlightthickness=False)
         self.logging_text.pack(side=tk.TOP)
 
     """

@@ -4,6 +4,7 @@ import tkmacosx as tkmac
 
 from models import *
 from Interface.styling import *
+from Interface.autocomplete_widget import Autocomplete
 
 class Watchlist(tk.Frame):
     def __init__(self, binance_contracts: typing.Dict[str, Contract], bitmex_contracts: typing.Dict[str, Contract], *args, **kwargs):
@@ -22,7 +23,7 @@ class Watchlist(tk.Frame):
         self._binance_label = tk.Label(self._commands_frame, text="Binance", bg=BG_COLOR, fg=FG_COLOR, font=BOLD_FONT)
         self._binance_label.grid(row=0,column=0) # location at top left, 1st cell
 
-        self._binance_entry = tk.Entry(self._commands_frame, fg=FG_COLOR, justify=tk.CENTER, insertbackground=FG_COLOR,
+        self._binance_entry = Autocomplete(self.binance_symbols ,self._commands_frame, fg=FG_COLOR, justify=tk.CENTER, insertbackground=FG_COLOR,
                                        bg=BG_COLOR_2, highlightthickness= False)
         #when binance button and enter is pressed, call a callback function
         self._binance_entry.bind("<Return>", self._add_binance_symbol)
@@ -31,7 +32,7 @@ class Watchlist(tk.Frame):
         self._bitmex_label = tk.Label(self._commands_frame, text="Binance", bg=BG_COLOR, fg=FG_COLOR, font=BOLD_FONT)
         self._bitmex_label.grid(row=0, column=1)
 
-        self._bitmex_entry = tk.Entry(self._commands_frame, fg=FG_COLOR, justify=tk.CENTER, insertbackground=FG_COLOR,
+        self._bitmex_entry = Autocomplete(self.bitmex_symbols, self._commands_frame, fg=FG_COLOR, justify=tk.CENTER, insertbackground=FG_COLOR,
                                       bg=BG_COLOR_2, highlightthickness= False)
 
         self._bitmex_entry.bind("<Return>", self._add_bitmex_symbol)

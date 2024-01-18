@@ -1,0 +1,1 @@
+venv\Scripts\python.env main.py

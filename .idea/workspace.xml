@@ -5,10 +5,67 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9ea1199a-31ff-4882-88cd-4bd171d1048e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qodana.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/start.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/docopt-0.6.2.dist-info/INSTALLER" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/docopt-0.6.2.dist-info/LICENSE-MIT" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/docopt-0.6.2.dist-info/METADATA" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/docopt-0.6.2.dist-info/RECORD" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/docopt-0.6.2.dist-info/WHEEL" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/docopt-0.6.2.dist-info/top_level.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/docopt.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/AUTHORS.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/INSTALLER" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/LICENSE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/METADATA" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/RECORD" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/REQUESTED" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/WHEEL" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/entry_points.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs-0.4.13.dist-info/top_level.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs/mapping" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs/pipreqs.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/pipreqs/stdlib" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/tests/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/tests/test_client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/tests/test_exceptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/tests/test_package.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/tests/test_parse.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/tests/test_release.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg-0.1.9.dist-info/DESCRIPTION.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg-0.1.9.dist-info/INSTALLER" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg-0.1.9.dist-info/METADATA" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg-0.1.9.dist-info/RECORD" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg-0.1.9.dist-info/WHEEL" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg-0.1.9.dist-info/metadata.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg-0.1.9.dist-info/top_level.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg-0.1.9.dist-info/zip-safe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg/__about__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg/client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg/exceptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg/package.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg/parse.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Lib/site-packages/yarg/release.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/venv/Scripts/pipreqs.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/venv/Connector/binance_futures.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Connector/binance_futures.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Connector/binance_futures.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Connector/binance.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/venv/Connector/bitmex.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Connector/bitmex.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Interface/autocomplete_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Interface/autocomplete_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Interface/logging_component.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Interface/logging_component.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/venv/Interface/root_component.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Interface/root_component.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Interface/scrollable_frame.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Interface/scrollable_frame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Interface/strategy_component.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Interface/strategy_component.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Interface/styling.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Interface/styling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Interface/trades_component.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Interface/trades_component.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Interface/watchlist_component.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Interface/watchlist_component.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/Strategies.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/Strategies.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/venv/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +81,19 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/venv/Connector/binance_futures.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/venv/Connector/bitmex.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/venv/Interface/autocomplete_widget.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/venv/Interface/root_component.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/venv/Interface/scrollable_frame.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/venv/Interface/strategy_component.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/venv/Interface/trades_component.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/venv/Interface/watchlist_component.py" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -50,6 +120,11 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
   }
 }</component>
+  <component name="QodanaReportsService">
+    <option name="descriptions">
+      <ReportDescription localRun="true" path="C:\Users\phili\AppData\Local\Temp\qodana_output\qodana.sarif.json" reportGuid="84ed36af-6518-401b-9580-18822b2192ec" reportId="pythonProject/qodana/2024-01-16" />
+    </option>
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\phili\PycharmProjects\TradingBotCourse\pythonProject\venv" />

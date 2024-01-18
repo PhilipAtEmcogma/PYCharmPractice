@@ -2,6 +2,7 @@ import logging
 import requests
 import time
 import typing
+import collections
 
 from urllib.parse import urlencode
 
@@ -17,7 +18,7 @@ import threading
 
 from models import *
 
-from Strategies import TechnicalStrategy, BreakoutStrategy
+from strategies import TechnicalStrategy, BreakoutStrategy
 
 
 logger = logging.getLogger()
@@ -25,6 +26,16 @@ logger = logging.getLogger()
 
 class BitmexClient:
     def __init__(self, public_key: str, secret_key: str, testnet: bool):
+
+        """
+        See comments in the Binance connector.
+        :param public_key:
+        :param secret_key:
+        :param testnet:
+        """
+
+        self.futures = True
+        self.platform = "bitmex"  # Just to have more homogeneous connectors, even if self.platform is not used
 
         if testnet:
             self._base_url = "https://testnet.bitmex.com"
@@ -45,7 +56,6 @@ class BitmexClient:
         self.prices = dict()
         self.strategies: typing.Dict[int, typing.Union[TechnicalStrategy, BreakoutStrategy]] = dict()
 
-        # the below is to check whether new data is avaliable to log, log it if so
         self.logs = []
 
         t = threading.Thread(target=self._start_ws)
@@ -53,7 +63,7 @@ class BitmexClient:
 
         logger.info("Bitmex Client successfully initialized")
 
-    def _add_log(self,msg: str):
+    def _add_log(self, msg: str):
         logger.info("%s", msg)
         self.logs.append({"log": msg, "displayed": False}) #displayed will become True, after new data had been logged
 
@@ -91,7 +101,7 @@ class BitmexClient:
                 logger.error("Connection error while making %s request to %s: %s", method, endpoint, e)
                 return None
         else:
-            raise ValueError
+            raise ValueError()
 
         if response.status_code == 200:
             return response.json()
@@ -110,7 +120,7 @@ class BitmexClient:
             for s in instruments:
                 contracts[s['symbol']] = Contract(s, "bitmex")
 
-        return contracts
+        return collections.OrderedDict(sorted(contracts.items()))  # Sort keys of the dictionary alphabetically
 
     def get_balances(self) -> typing.Dict[str, Balance]:
         data = dict()
@@ -130,7 +140,6 @@ class BitmexClient:
         data = dict()
 
         data['symbol'] = contract.symbol
-        # partial is to return partial candel, even though the origial time candle (e.g. 4h) has not fully formed
         data['partial'] = True
         data['binSize'] = timeframe
         data['count'] = 500
@@ -142,19 +151,22 @@ class BitmexClient:
 
         if raw_candles is not None:
             for c in reversed(raw_candles):
-                candles.append(Candle(c,timeframe,"bitmex"))
+                if c['open'] is None or c['close'] is None:  # Some candles returned by Bitmex miss data
+                    continue
+                candles.append(Candle(c, timeframe, "bitmex"))
 
         return candles
 
-    def place_order(self, contract:Contract, order_type: str, quantity: int, side: str, price=None, tif=None) -> OrderStatus:
+    def place_order(self, contract: Contract, order_type: str, quantity: int, side: str, price=None, tif=None) -> OrderStatus:
         data = dict()
+
         data['symbol'] = contract.symbol
         data['side'] = side.capitalize()
-        data['orderQty'] = round(quantity/contract.lot_size) * contract.lot_size
-        data['orderType'] = order_type.capitalize()
+        data['orderQty'] = round(quantity / contract.lot_size) * contract.lot_size
+        data['ordType'] = order_type.capitalize()
 
         if price is not None:
-            data['price'] = round(round(price/contract.tick_size) * contract.tick_size, 8)
+            data['price'] = round(round(price / contract.tick_size) * contract.tick_size, 8)
 
         if tif is not None:
             data['timeInForce'] = tif
@@ -166,34 +178,33 @@ class BitmexClient:
 
         return order_status
 
-    def cancel_order(self, order_id: str):
+    def cancel_order(self, order_id: str) -> OrderStatus:
         data = dict()
-        data['orderID'] = order_type.capitalize()
+        data['orderID'] = order_id
 
         order_status = self._make_request("DELETE", "/api/v1/order", data)
 
         if order_status is not None:
-            order_status = OrderStatus(order_status[0],"bitmex")
+            order_status = OrderStatus(order_status[0], "bitmex")
 
         return order_status
 
-    def get_order_status(self, order_id: str,contract: Contract):
-        data= dict()
+    def get_order_status(self, contract: Contract, order_id: str) -> OrderStatus:
+
+        data = dict()
         data['symbol'] = contract.symbol
-        data['reverse'] = True # using reverse mean get the latest order, i.e. last in the order list
+        data['reverse'] = True
 
         order_status = self._make_request("GET", "/api/v1/order", data)
 
         if order_status is not None:
             for order in order_status:
                 if order['orderID'] == order_id:
-                    return OrderStatus(order,"bitmex")
-
-        return order_status
+                    return OrderStatus(order, "bitmex")
 
     def _start_ws(self):
         self.ws = websocket.WebSocketApp(self._wss_url, on_open=self._on_open, on_close=self._on_close,
-                                          on_error=self._on_error, on_message=self._on_message)
+                                         on_error=self._on_error, on_message=self._on_message)
 
         while True:
             try:
@@ -202,7 +213,7 @@ class BitmexClient:
                 else:
                     break
             except Exception as e:
-                logger.error("Bitmex error in run_forever() method: %s",e)
+                logger.error("Bitmex error in run_forever() method: %s", e)
             time.sleep(2)
 
     def _on_open(self, ws):
@@ -223,7 +234,9 @@ class BitmexClient:
 
         if "table" in data:
             if data['table'] == "instrument":
+
                 for d in data['data']:
+
                     symbol = d['symbol']
 
                     if symbol not in self.prices:
@@ -231,15 +244,17 @@ class BitmexClient:
 
                     if 'bidPrice' in d:
                         self.prices[symbol]['bid'] = d['bidPrice']
-                    if 'bidPrice' in d:
+                    if 'askPrice' in d:
                         self.prices[symbol]['ask'] = d['askPrice']
 
-                    # PNL calculation
+                    # PNL Calculation
+
                     try:
                         for b_index, strat in self.strategies.items():
                             if strat.contract.symbol == symbol:
                                 for trade in strat.trades:
                                     if trade.status == "open" and trade.entry_price is not None:
+
                                         if trade.side == "long":
                                             price = self.prices[symbol]['bid']
                                         else:
@@ -250,26 +265,30 @@ class BitmexClient:
                                             XBt PNL of 1 contract.
                                             Inverse:
                                                 (1/EntryPrice - 1/ExitPrice) *$1
-                                                
+
                                             Quanto (will be similar to Binance):
                                                 (ExitPrice - EntryPrice) * Multiplier                                    
                                         """
+
                                         if trade.contract.inverse:
                                             if trade.side == "long":
-                                                trade.pnl = (1/trade.entry_price - 1/price)* multiplier * trade.quantity
+                                                trade.pnl = (
+                                                                        1 / trade.entry_price - 1 / price) * multiplier * trade.quantity
                                             elif trade.side == "short":
-                                                trade.pnl = (1/price - 1/trade.entry_price) * multiplier * trade.quantity
-
+                                                trade.pnl = (
+                                                                        1 / price - 1 / trade.entry_price) * multiplier * trade.quantity
                                         else:
                                             if trade.side == "long":
-                                                trade.pnl = (price - trade.entry_price)* multiplier * trade.quantity
+                                                trade.pnl = (price - trade.entry_price) * multiplier * trade.quantity
                                             elif trade.side == "short":
-                                                trade.pnl = (trade.entry_price - price)* multiplier * trade.quantity
+                                                trade.pnl = (trade.entry_price - price) * multiplier * trade.quantity
                     except RuntimeError as e:
-                        logger.error("Error while looping through the Bitmex Strategies: %s", e)
+                        logger.error("Error while looping through the Bitmex strategies: %s", e)
 
             if data['table'] == "trade":
+
                 for d in data['data']:
+
                     symbol = d['symbol']
 
                     # timestamp below represents the dime of the data,
@@ -282,14 +301,6 @@ class BitmexClient:
                             res = strat.parse_trades(float(d['price']), float(d['size']), ts)
                             strat.check_trade(res)
 
-                    """"
-                    if symbol == "XBTUSD":
-                        self._add_log(symbol + " " + str(self.prices[symbol]['bid']) + " / "
-                                                         + str(self.prices[symbol]['ask']))
-                    """
-
-                    # print(symbol, self.prices[symbol])
-
     def subscribe_channel(self, topic: str):
         data = dict()
         data['op'] = "subscribe"
@@ -301,12 +312,19 @@ class BitmexClient:
         except Exception as e:
             logger.error("Websocket error while subscribing to %s: %s", topic, e)
 
+    def get_trade_size(self, contract: Contract, price: float, balance_pct: float):
 
-    def get_trade_size(self, contract:Contract, price:float, balance_pct:float):
+        """
+        Compute the trade size for the strategy module based on the percentage of the balance to use
+        that was defined in the strategy component and the type of contract.
+        :param contract:
+        :param price: Used to convert the amount to invest into an amount to buy/sell
+        :param balance_pct:
+        :return:
+        """
 
         balance = self.get_balances()
         if balance is not None:
-            # check if balance have USDT key to trade with, i.e. have money to trade with
             if 'XBt' in balance:
                 balance = balance['XBt'].wallet_balance
             else:
@@ -316,19 +334,22 @@ class BitmexClient:
 
         xbt_size = balance * balance_pct / 100
 
+        # The trade size calculation depends on the type of contract
+        # https://www.bitmex.com/app/perpetualContractsGuide
+
         # calculate the number of contracts to trade, NOTE: inverse, quato and linear are different type of trade mechanism
         # for inverse contract of perpetual and futures contracts, xBt value of 1 contract = 1/Price*$1, $1 is the multiplier
         if contract.inverse:
-            contract_number = xbt_size / (contract.multiplier/price)
+            contracts_number = xbt_size / (contract.multiplier / price)
         # for quanto contract, xBt value of 1 contract = multiplier * price
         elif contract.quanto:
-            contract_number = xbt_size / (contract.multiplier * price)
+            contracts_number = xbt_size / (contract.multiplier * price)
         # linear contract use same formular to
         else:
-            contract_number = xbt_size / (contract.multiplier * price)
+            contracts_number = xbt_size / (contract.multiplier * price)
 
-        logger.info("Bitmex current XBT balance = %s, contracts number = %s", balance, contract_number)
+        logger.info("Bitmex current XBT balance = %s, contracts number = %s", balance, contracts_number)
 
-        return int(contract_number)
+        return int(contracts_number)
 
 

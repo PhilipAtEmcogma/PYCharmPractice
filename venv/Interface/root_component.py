@@ -3,14 +3,14 @@ from tkinter.messagebox import askquestion
 import logging
 import json
 
-from connectors.bitmex import BitmexClient
-from connectors.binance import BinanceClient
+from Connector.bitmex import BitmexClient
+from Connector.binance import BinanceClient
 
-from interface.styling import *
-from interface.logging_component import Logging
-from interface.watchlist_component import Watchlist
-from interface.trades_component import TradesWatch
-from interface.strategy_component import StrategyEditor
+from Interface.styling import *
+from Interface.logging_component import Logging
+from Interface.watchlist_component import Watchlist
+from Interface.trades_component import TradesWatch
+from Interface.strategy_component import StrategyEditor
 
 
 logger = logging.getLogger()  # This will be the same logger object as the one configured in main.py

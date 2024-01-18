@@ -18,7 +18,7 @@ import threading
 
 from models import *
 
-from strategies import TechnicalStrategy, BreakoutStrategy
+from Strategies import TechnicalStrategy, BreakoutStrategy
 
 
 logger = logging.getLogger()

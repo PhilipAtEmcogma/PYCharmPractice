@@ -1,7 +1,7 @@
 import tkinter as tk
 from datetime import datetime
 
-from interface.styling import *
+from Interface.styling import *
 
 
 class Logging(tk.Frame):

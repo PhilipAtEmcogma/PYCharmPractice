@@ -1,0 +1,14 @@
+2024-01-19 01:35:14,072 DEBUG :: Starting new HTTPS connection (1): testnet.binancefuture.com:443
+2024-01-19 01:35:15,891 DEBUG :: https://testnet.binancefuture.com:443 "GET /fapi/v1/exchangeInfo HTTP/1.1" 200 None
+2024-01-19 01:35:15,901 DEBUG :: Starting new HTTPS connection (1): testnet.binancefuture.com:443
+2024-01-19 01:35:16,963 DEBUG :: https://testnet.binancefuture.com:443 "GET /fapi/v1/account?timestamp=1705581315900&signature=220cf563c022650968d4f473d4069aab3e61edaf208cbd368d0d1594d2822eff HTTP/1.1" 400 87
+2024-01-19 01:35:16,963 ERROR :: Error while making GET request to /fapi/v1/account: {'code': -5000, 'msg': 'GET /fapi/v1/account is retired, please use GET /fapi/v2/account'} (error code 400)
+2024-01-19 01:35:16,965 INFO :: Binance Futures Client successfully initialized
+2024-01-19 01:35:16,968 DEBUG :: Starting new HTTPS connection (1): testnet.bitmex.com:443
+2024-01-19 01:35:18,456 INFO :: Binance connection opened
+2024-01-19 01:35:18,461 INFO :: Binance: subscribing to: btcusdt@bookTicker
+2024-01-19 01:35:18,795 DEBUG :: https://testnet.bitmex.com:443 "GET /api/v1/instrument/active HTTP/1.1" 200 None
+2024-01-19 01:35:19,257 DEBUG :: Starting new HTTPS connection (1): testnet.bitmex.com:443
+2024-01-19 01:35:20,260 DEBUG :: https://testnet.bitmex.com:443 "GET /api/v1/user/margin?currency=all HTTP/1.1" 200 None
+2024-01-19 01:35:20,263 INFO :: Bitmex Client successfully initialized
+2024-01-19 01:35:22,286 INFO :: Bitmex connection opened

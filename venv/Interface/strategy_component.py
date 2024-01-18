@@ -4,13 +4,13 @@ import tkmacosx as tkmac
 
 import json
 
-from Interfacenterface.styling import *
-from Interfacenterface.scrollable_frame import ScrollableFrame
+from Interface.styling import *
+from Interface.scrollable_frame import ScrollableFrame
 
-from Connectoronnectors.binance import BinanceClient
-from Connectoronnectors.bitmex import BitmexClient
+from Connector.binance import BinanceClient
+from Connector.bitmex import BitmexClient
 
-from strategies import TechnicalStrategy, BreakoutStrategy
+from Strategies import TechnicalStrategy, BreakoutStrategy
 from utils import *
 
 from database import WorkspaceData

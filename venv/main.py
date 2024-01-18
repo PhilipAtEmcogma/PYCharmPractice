@@ -1,7 +1,7 @@
 import logging
 
-from connectors.binance import BinanceClient
-from connectors.bitmex import BitmexClient
+from Connector.binance import BinanceClient
+from Connector.bitmex import BitmexClient
 
 from Interface.root_component import Root
 
